@@ -1,6 +1,9 @@
 package org.example.Logic;
 
+import org.example.Logic.Strategy.ConcreteStrategyQueue;
 import org.example.Logic.Strategy.ConcreteStrategyTime;
+import org.example.Logic.Strategy.SelectionPolicy;
+import org.example.Logic.Strategy.Strategy;
 import org.example.Model.Server;
 import org.example.Model.Task;
 
@@ -18,12 +21,15 @@ public class Scheduler {
     private final int maxNoServers;
     private final int maxTasksPerServer;
     ConcreteStrategyTime concreteStrategyTime;
+    ConcreteStrategyQueue concreteStrategyQueue;
     private final Lock lock = new ReentrantLock();
+    private Strategy strategy;
 
     public Scheduler(int maxNoServers, int maxTasksPerServer) {
         this.maxNoServers = maxNoServers;
         this.maxTasksPerServer = maxTasksPerServer;
         this.concreteStrategyTime=new ConcreteStrategyTime();
+        this.concreteStrategyQueue=new ConcreteStrategyQueue();
         servers = new ArrayList<>();
         for (int i = 0; i < maxNoServers; i++) {
             BlockingQueue<Task> tasks = new LinkedBlockingQueue<>();
@@ -35,6 +41,13 @@ public class Scheduler {
         }
     }
 
+    public void changeStrategy(SelectionPolicy policy)
+    {
+        if(policy==SelectionPolicy.SHORTEST_QUEUE)
+            strategy=new ConcreteStrategyQueue();
+        if(policy==SelectionPolicy.SHORTEST_TIME)
+            strategy=new ConcreteStrategyTime();
+    }
     public void dispatchTask(Task task) {
         lock.lock();
         try {

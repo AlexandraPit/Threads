@@ -11,7 +11,7 @@ public class ConcreteStrategyTime implements Strategy {
         // Find the server with the shortest service time
         Server shortestServer = servers.get(0);
         for (Server server : servers) {
-            if (server.getTasks().size() < shortestServer.getTasks().size()) {
+            if (server.getWaitingPeriod().get() <  shortestServer.getWaitingPeriod().get()) {
                 shortestServer = server;
             }
         }
@@ -19,4 +19,6 @@ public class ConcreteStrategyTime implements Strategy {
         shortestServer.addTask(task);
         return shortestServer;
     }
+
+
 }

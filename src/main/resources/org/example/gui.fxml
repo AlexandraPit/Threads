@@ -43,28 +43,28 @@
          <children>
             <AnchorPane prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #AA7BC3;">
                <children>
-                  <TextField fx:id="nrQues" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" />
+                  <TextField fx:id="nrQues" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" text="2" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #944BBB;">
                <children>
-                  <TextField fx:id="nrClients" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" />
+                  <TextField fx:id="nrClients" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" text="4" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #AA7BC3;">
                <children>
-                  <TextField fx:id="simTime" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" />
+                  <TextField fx:id="simTime" layoutX="14.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" text="15" />
                </children>
             </AnchorPane>
             <AnchorPane prefHeight="40.0" prefWidth="127.0" style="-fx-background-color: #944BBB;">
                <children>
-                  <TextField fx:id="arrivalTimeMin" layoutX="65.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" />
+                  <TextField fx:id="arrivalTimeMin" layoutX="65.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" text="2" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" text="and">
                      <font>
                         <Font name="Georgia" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="arrivalTimeMax" layoutX="148.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" />
+                  <TextField fx:id="arrivalTimeMax" layoutX="148.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" text="7" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutY="7.0" prefHeight="26.0" prefWidth="58.0" text="between">
                      <font>
                         <Font name="Georgia" size="14.0" />
@@ -74,13 +74,13 @@
             </AnchorPane>
             <AnchorPane prefHeight="40.0" prefWidth="127.0" style="-fx-background-color: #AA7BC3;">
                <children>
-                  <TextField fx:id="serviceTimeMin" layoutX="65.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" />
+                  <TextField fx:id="serviceTimeMin" layoutX="65.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" text="2" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="7.0" prefHeight="26.0" prefWidth="48.0" text="and">
                      <font>
                         <Font name="Georgia" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="serviceTimeMax" layoutX="148.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" />
+                  <TextField fx:id="serviceTimeMax" layoutX="148.0" layoutY="7.0" prefHeight="26.0" prefWidth="34.0" text="4" />
                   <Label alignment="CENTER" contentDisplay="CENTER" layoutY="7.0" prefHeight="26.0" prefWidth="58.0" text="between">
                      <font>
                         <Font name="Georgia" size="14.0" />
@@ -149,13 +149,19 @@
             <Font name="Georgia" size="14.0" />
          </font>
       </Label>
-      <VBox layoutX="610.0" layoutY="16.0" prefHeight="200.0" prefWidth="100.0" />
+      <VBox fx:id="results" layoutX="455.0" layoutY="65.0" prefHeight="153.0" prefWidth="236.0" />
       <Label layoutX="457.0" layoutY="14.0" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #AA7BC3;" text=" Current Time:">
          <font>
             <Font name="Georgia" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="currentTime" layoutX="549.0" layoutY="14.0" prefHeight="40.0" prefWidth="48.0" style="-fx-background-color: #AA7BC3;">
+      <Label fx:id="currentTime" alignment="CENTER" layoutX="549.0" layoutY="14.0" prefHeight="40.0" prefWidth="48.0" style="-fx-background-color: #AA7BC3;" textFill="WHITE">
+         <font>
+            <Font name="Georgia" size="14.0" />
+         </font>
+      </Label>
+      <VBox fx:id="waitingClients" layoutX="610.0" layoutY="294.0" prefHeight="290.0" prefWidth="100.0" />
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="610.0" layoutY="268.0" prefHeight="26.0" prefWidth="100.0" text="Waiting Clients" textFill="WHITE">
          <font>
             <Font name="Georgia" size="14.0" />
          </font>

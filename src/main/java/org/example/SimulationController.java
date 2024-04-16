@@ -2,15 +2,21 @@ package org.example;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import org.example.Logic.SimulationManager;
 import org.example.Model.Server;
 import org.example.Model.Task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimulationController {
     @FXML
@@ -39,10 +45,14 @@ public class SimulationController {
     private ScrollPane q4;
     @FXML
     private ScrollPane q5;
+    @FXML
+    private VBox waitingClients;
+    @FXML
+    private VBox results;
 
     private SimulationManager simulationManager;
-    public void setCurrentTimeLabel(String time) {
-        Platform.runLater(() -> this.currentTime.setText(time));
+    public void setCurrentTimeLabel(int time) {
+       this.currentTime.setText(Integer.toString(time));
     }
 
     @FXML
@@ -56,17 +66,9 @@ public class SimulationController {
         int serviceTimeMinValue = Integer.parseInt(serviceTimeMin.getText());
         int serviceTimeMaxValue = Integer.parseInt(serviceTimeMax.getText());
         this.simulationManager=new SimulationManager(simulationTime,serviceTimeMaxValue,serviceTimeMinValue,arrivalTimeMaxValue,arrivalTimeMinValue,numberOfQueues,numberOfClients, this);
-        // Set simulation parameters in SimulationManager
-        //new Thread(simulationManager).start();
-        // Run the simulation
-        simulationManager.run();
+        Thread simulationThread=new Thread(simulationManager);
+        simulationThread.start();
 
-        // Once simulation is done, you can retrieve results from SimulationManager
-        // and display them in the UI
-        // For example:
-        // List<Queue> queues = simulationManager.getQueues();
-        // Display queue contents in the UI
-        // Note: You need to implement methods in SimulationManager to retrieve queue information
     }
     public void updateQueues(Server[] servers) {
         for (int i = 0; i < servers.length && i < 5; i++) { // Ensure we only iterate up to the number of defined scroll panes
@@ -96,21 +98,53 @@ public class SimulationController {
 
     private void updateQueue(ScrollPane scrollPane, BlockingQueue<Task> tasks) {
         VBox vbox = new VBox();
+        vbox.setAlignment(Pos.TOP_CENTER);
         for (Task task : tasks) {
-            vbox.getChildren().add(new Label(task.toString()));
+
+            Label clientsLabel = new Label(task.toString());
+            clientsLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+            vbox.getChildren().add(clientsLabel);
         }
         scrollPane.setContent(vbox);
     }
+    public void updateWaitingClients(List<Task> clients){
+        waitingClients.setAlignment(Pos.TOP_CENTER);
+        waitingClients.getChildren().clear();
+        for( Task task : clients)
+        {
+            Label waitingLabel = new Label( task.toString());
+            waitingLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+            //waitingLabel.setTextFill(Color.WHITE);
+            waitingClients.getChildren().add(waitingLabel);
+        }}
+    public void setResults(double avgWaitingTime, double avgServiceTime, AtomicInteger peakhour){
+        Label avgWaitingLabel = new Label("  Average Waiting Time: " + avgWaitingTime);
+        avgWaitingLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+        avgWaitingLabel.setTextFill(Color.WHITE); // Set text color
 
-    private VBox getQueueBox(int queueIndex) {
-        switch (queueIndex) {
-            case 0:
-                return q1.getContent() instanceof VBox ? (VBox) q1.getContent() : null;
-            case 1:
-                return q2.getContent() instanceof VBox ? (VBox) q2.getContent() : null;
-            // Add cases for other queues...
-            default:
-                return null;
-        }
+        Label avgServiceLabel = new Label("  Average Service Time: " + avgServiceTime);
+        avgServiceLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+        avgServiceLabel.setTextFill(Color.WHITE);
+
+        Label resLabel = new Label("  Simulation Results: ");
+        resLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+
+
+        Label peakLabel = new Label("  Peak Hour: " + peakhour);
+        peakLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
+        peakLabel.setTextFill(Color.WHITE);
+        Label spacer1 = new Label("");
+        Label spacer2 = new Label("");
+        Label spacer3 = new Label("");
+        Label spacer4 = new Label("");
+        results.setStyle("-fx-background-color: #AA7BC3;");
+        results.getChildren().add(spacer4);
+        results.getChildren().add(resLabel);
+        results.getChildren().add(spacer1);
+        results.getChildren().add(avgWaitingLabel);
+        results.getChildren().add(spacer2);
+        results.getChildren().add(avgServiceLabel);
+        results.getChildren().add(spacer3);
+        results.getChildren().add(peakLabel);
     }
 }
