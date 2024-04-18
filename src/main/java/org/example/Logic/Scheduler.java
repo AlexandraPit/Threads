@@ -19,17 +19,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Scheduler {
     private final List<Server> servers;
     private final int maxNoServers;
-    private final int maxTasksPerServer;
     ConcreteStrategyTime concreteStrategyTime;
     ConcreteStrategyQueue concreteStrategyQueue;
     private final Lock lock = new ReentrantLock();
     private Strategy strategy;
 
-    public Scheduler(int maxNoServers, int maxTasksPerServer) {
+    public Scheduler(int maxNoServers ) {
         this.maxNoServers = maxNoServers;
-        this.maxTasksPerServer = maxTasksPerServer;
-        this.concreteStrategyTime=new ConcreteStrategyTime();
-        this.concreteStrategyQueue=new ConcreteStrategyQueue();
         servers = new ArrayList<>();
         for (int i = 0; i < maxNoServers; i++) {
             BlockingQueue<Task> tasks = new LinkedBlockingQueue<>();
@@ -39,47 +35,37 @@ public class Scheduler {
             thread.start();
             servers.add(server);
         }
+        strategy=new ConcreteStrategyTime();
     }
 
     public void changeStrategy(SelectionPolicy policy)
-    {
-        if(policy==SelectionPolicy.SHORTEST_QUEUE)
-            strategy=new ConcreteStrategyQueue();
-        if(policy==SelectionPolicy.SHORTEST_TIME)
-            strategy=new ConcreteStrategyTime();
+    {lock.lock();
+        try {
+            if (policy == SelectionPolicy.SHORTEST_QUEUE) {
+                strategy = new ConcreteStrategyQueue();
+            } else if (policy == SelectionPolicy.SHORTEST_TIME) {
+                strategy = new ConcreteStrategyTime();
+            } else {
+                // Handle unsupported policy
+                System.err.println("Unsupported policy: " + policy);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
     public void dispatchTask(Task task) {
         lock.lock();
         try {
-            concreteStrategyTime.addTask(servers,task);
+            if (strategy != null) {
+                strategy.addTask(servers, task);
+            } else {
+                System.err.println("Strategy is not initialized.");
+            }
         } finally {
             lock.unlock();
         }
     }
 
-    private Server getAvailableServer() {
-        for (Server server : servers) {
-            if (server.getTasksSize()<maxTasksPerServer) {
-                return server;
-            }
-        }
-        return null;
-    }
-    public void updateServiceTime(int currentTime) {
-        lock.lock();
-        try {
-            for (Server server : servers) {
-                BlockingQueue<Task> serverTasks = server.getTasks();
-                for (Task task : serverTasks) {
-                    if(task.getArrivalTime()<=currentTime) {
-                        task.decrementServiceTime();
-                    }
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
     public List<Server> getServers() {
         lock.lock();
         try {

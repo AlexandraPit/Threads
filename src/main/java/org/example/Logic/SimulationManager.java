@@ -1,12 +1,13 @@
 package org.example.Logic;
 
 import javafx.application.Platform;
-import org.example.Logic.Strategy.SelectionPolicy;
-import org.example.Logic.Strategy.Strategy;
 import org.example.Model.Server;
 import org.example.Model.Task;
-import org.example.SimulationController;
+import org.example.View.SimulationController;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,7 @@ public class SimulationManager implements Runnable {
     private Scheduler scheduler;
     private List<Task> generatedTasks;
     private SimulationController controller;
+    private PrintStream fileOutput;
 
     private AtomicInteger totalWaitingTime = new AtomicInteger(0);
     private AtomicInteger totalServiceTime = new AtomicInteger(0);
@@ -37,9 +39,15 @@ public class SimulationManager implements Runnable {
         this.maxArrivalTime=maxArrivalTime;
         this.numberOfServers = numberOfServers;
         this.numberOfClients = numberOfClients;
-        scheduler = new Scheduler(numberOfServers, 10); // Assuming 10 is the maximum number of tasks per server
+        scheduler = new Scheduler(numberOfServers);
+        try {
+            fileOutput = new PrintStream(new FileOutputStream("simulation_output2.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         generatedTasks = Collections.synchronizedList(new ArrayList<>());
         this.controller=controller;
+        System.setOut(fileOutput);
     }
 
     public void updateTime(int currentTime)
@@ -55,7 +63,6 @@ public class SimulationManager implements Runnable {
         int currentTime;
         int maxClientsInQueue = 0;
         int currentHour = 0;
-
         generateNRandomTasks();
         Collections.sort(generatedTasks, Comparator.comparingInt(Task::getArrivalTime));
         int totalTasks = generatedTasks.size();
@@ -174,6 +181,11 @@ public class SimulationManager implements Runnable {
             server.end(); // Signal the server to stop processing tasks
         }
     }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     private void generateNRandomTasks() {
         synchronized (generatedTasks){
             Random random = new Random();

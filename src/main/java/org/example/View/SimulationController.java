@@ -1,15 +1,18 @@
-package org.example;
+package org.example.View;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import org.example.Logic.Scheduler;
 import org.example.Logic.SimulationManager;
+import org.example.Logic.Strategy.SelectionPolicy;
 import org.example.Model.Server;
 import org.example.Model.Task;
 
@@ -49,14 +52,23 @@ public class SimulationController {
     private VBox waitingClients;
     @FXML
     private VBox results;
-
+    @FXML
+    private ChoiceBox<SelectionPolicy> strategyChoiceBox;
+    @FXML
+    private Label error;
     private SimulationManager simulationManager;
+    private Scheduler scheduler;
     public void setCurrentTimeLabel(int time) {
        this.currentTime.setText(Integer.toString(time));
     }
 
+    public SimulationController() {
+        // Initialize the scheduler here
+        this.scheduler = new Scheduler(1); // You may need to adjust the constructor parameters
+    }
     @FXML
     private void startSimulation() {
+        error.setText("");
         // Retrieve input parameters from UI fields
         int numberOfQueues = Integer.parseInt(nrQues.getText());
         int numberOfClients = Integer.parseInt(nrClients.getText());
@@ -65,8 +77,18 @@ public class SimulationController {
         int arrivalTimeMaxValue = Integer.parseInt(arrivalTimeMax.getText());
         int serviceTimeMinValue = Integer.parseInt(serviceTimeMin.getText());
         int serviceTimeMaxValue = Integer.parseInt(serviceTimeMax.getText());
+
+        if (numberOfQueues > 5) {
+            // Display an error message to the user
+            // You can choose how to handle the error, such as showing a dialog box or updating a label
+            error.setText("Error: Number of queues is too large.\nMaximum number of queues allowed is 5.");
+            System.err.println("Error: Number of queues is too large. Maximum number of queues allowed is 5.");
+            return; // Exit the method without starting the simulation
+        }
+
         this.simulationManager=new SimulationManager(simulationTime,serviceTimeMaxValue,serviceTimeMinValue,arrivalTimeMaxValue,arrivalTimeMinValue,numberOfQueues,numberOfClients, this);
         Thread simulationThread=new Thread(simulationManager);
+        this.scheduler=simulationManager.getScheduler();
         simulationThread.start();
 
     }
@@ -76,6 +98,24 @@ public class SimulationController {
         }
     }
 
+
+
+    // Method to initialize the choice box
+    @FXML
+    public void initialize() {
+
+        // Populate the choice box with strategy options
+        strategyChoiceBox.getItems().addAll(SelectionPolicy.SHORTEST_QUEUE, SelectionPolicy.SHORTEST_TIME);
+
+        // Set a default selection
+        strategyChoiceBox.setValue(SelectionPolicy.SHORTEST_QUEUE);
+
+        // Add an event listener to the choice box
+        strategyChoiceBox.setOnAction(event -> {
+            SelectionPolicy selectedStrategy = strategyChoiceBox.getValue();
+            scheduler.changeStrategy(selectedStrategy);
+        });
+    }
 
 
     private ScrollPane getScrollPane(int index) {
@@ -118,6 +158,7 @@ public class SimulationController {
             waitingClients.getChildren().add(waitingLabel);
         }}
     public void setResults(double avgWaitingTime, double avgServiceTime, AtomicInteger peakhour){
+        results.getChildren().clear();
         Label avgWaitingLabel = new Label("  Average Waiting Time: " + avgWaitingTime);
         avgWaitingLabel.setFont(Font.font("Georgia", 14)); // Set font size and type
         avgWaitingLabel.setTextFill(Color.WHITE); // Set text color

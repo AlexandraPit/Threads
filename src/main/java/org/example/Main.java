@@ -5,7 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.example.Logic.SimulationManager;
+import org.example.View.SimulationController;
 
 public class Main extends Application {
 

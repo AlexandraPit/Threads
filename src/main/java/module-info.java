@@ -5,4 +5,6 @@ module org.example.pt2024_30423_pitaru_alexandra_assignment_2 {
 
     opens org.example to javafx.fxml;
     exports org.example;
+    exports org.example.View;
+    opens org.example.View to javafx.fxml;
 }

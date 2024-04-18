@@ -2,14 +2,11 @@ package org.example.Model;
 
 import javafx.application.Platform;
 import org.example.Logic.Scheduler;
-import org.example.Logic.SimulationManager;
-import org.example.Model.Task;
-import org.example.SimulationController;
+import org.example.View.SimulationController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,25 +35,10 @@ public class Server implements Runnable {
 
     public void addTask(Task newTask) {
         totalWaitingTime.addAndGet(waitingPeriod.get());
-            tasks.offer(newTask); // Add task to the queue
-        for(int i=0; i<newTask.getServiceTime(); i++) {
+        tasks.offer(newTask); // Add task to the queue
+        for (int i = 0; i < newTask.getServiceTime(); i++) {
             waitingPeriod.incrementAndGet(); // Increment the waiting period
         }
-    }
-        public void removeTask(Task task) {
-        boolean removed = tasks.remove(task);
-        if (removed) {
-            waitingPeriod.decrementAndGet(); // Decrement the waiting period if the task was removed successfully
-        } else {
-            System.err.println("Task not found in the server queue");
-        }
-    }
-    public List<Integer> getIds() {
-        List<Integer> ids = new ArrayList<>();
-        for (Task task : tasks) {
-            ids.add(task.getId());
-        }
-        return ids;
     }
     public void end() {
         done.set(true); // Set done flag to true to stop the server thread
@@ -88,18 +70,6 @@ public class Server implements Runnable {
         this.currentTime = currentTime;
     }
 
-    public AtomicInteger getTotalWaitingTime() {
-        return totalWaitingTime;
-    }
-
-    private void updateInterface() {
-        Platform.runLater(() -> {
-            // Update interface components here
-            // For example:
-             controller.setCurrentTimeLabel(currentTime);
-            //controller.updateWaitingPeriod(id, waitingPeriod.get());
-        });
-    }
     public BlockingQueue<Task> getTasks() {
         return tasks;
     }
